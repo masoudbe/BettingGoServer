@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // App has router and db instances
@@ -20,17 +22,13 @@ type App struct {
 
 // App initialize with predefined configuration
 func (a *App) Initialize(config *config.Config) {
-	//dbURI := fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
-	//	config.DB.Username,
-	//	config.DB.Password,
-	//	config.DB.Name,
-	//	config.DB.Charset)
+	dbURI := fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
+		config.DB.Username,
+		config.DB.Password,
+		config.DB.Name,
+		config.DB.Charset)
 
-	db, err := gorm.Open("postgres",
-		`host=localhost 
-      user=postgres password=123456
-      dbname=Betting 
-      sslmode=disable`)
+	db, err := gorm.Open("mysql", dbURI)
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}

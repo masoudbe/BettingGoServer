@@ -9,13 +9,13 @@ import (
 )
 
 func GetAllVoters(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
-	voters := []model.Voter{}
+	voters := []model.VoteInfo{}
 	db.Find(&voters)
 	respondJSON(w, http.StatusOK, voters)
 }
 
 func CreateVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
-	voter := model.Voter{}
+	voter := model.VoteInfo{}
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&voter); err != nil {
@@ -32,7 +32,7 @@ func CreateVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateVoters(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
-	voters:= []model.Voter{}
+	voters := []model.VoteInfo{}
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&voters); err != nil {
