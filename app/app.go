@@ -14,13 +14,11 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// App has router and db instances
 type App struct {
 	Router *mux.Router
 	DB     *gorm.DB
 }
 
-// App initialize with predefined configuration
 func (a *App) Initialize(config *config.Config) {
 	dbURI := fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,
@@ -38,61 +36,59 @@ func (a *App) Initialize(config *config.Config) {
 	a.setRouters()
 }
 
-// Set all required routers
 func (a *App) setRouters() {
-	// Routing for handling the projects
-	a.Get("/api/voters", a.GetAllVoters)
-	a.Post("/api/voter", a.CreateVoter)
-	a.Post("/api/voters", a.CreateVoters)
-	a.Get("/api/voters/{voter}", a.GetVoter)
-	a.Put("/api/voters/{voter}", a.UpdateVoter)
-	a.Delete("/api/voters/{voter}", a.DeleteVoter)
+	a.Get("/api/isConnect", a.IsConnect)
+	a.Get("/api/getVotes", a.GetVotes)
+	a.Post("/api/createVotes", a.CreateVotes)
+	a.Post("/api/createVote", a.CreateVote)
+	a.Get("/api/voters/{voter}", a.GetVote)
+	a.Put("/api/voters/{voter}", a.UpdateVote)
+	a.Delete("/api/voters/{voter}", a.DeleteVote)
 	//a.Put("/employees/{title}/enable", a.EnableEmployee)
 }
 
-// Wrap the router for GET method
 func (a *App) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods("GET")
 }
 
-// Wrap the router for POST method
 func (a *App) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods("POST")
 }
 
-// Wrap the router for PUT method
 func (a *App) Put(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods("PUT")
 }
 
-// Wrap the router for DELETE method
 func (a *App) Delete(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods("DELETE")
 }
 
-// Handlers to manage Employee Data
-func (a *App) GetAllVoters(w http.ResponseWriter, r *http.Request) {
-	dao.GetAllVoters(a.DB, w, r)
+func (a *App) IsConnect(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "server started")
 }
 
-func (a *App) CreateVoter(w http.ResponseWriter, r *http.Request) {
-	dao.CreateVoter(a.DB, w, r)
+func (a *App) GetVotes(w http.ResponseWriter, r *http.Request) {
+	dao.GetVotes(a.DB, w, r)
 }
 
-func (a *App) CreateVoters(w http.ResponseWriter, r *http.Request) {
-	dao.CreateVoters(a.DB, w, r)
+func (a *App) CreateVote(w http.ResponseWriter, r *http.Request) {
+	dao.CreateVote(a.DB, w, r)
 }
 
-func (a *App) GetVoter(w http.ResponseWriter, r *http.Request) {
-	dao.GetVoter(a.DB, w, r)
+func (a *App) CreateVotes(w http.ResponseWriter, r *http.Request) {
+	dao.CreateVotes(a.DB, w, r)
 }
 
-func (a *App) UpdateVoter(w http.ResponseWriter, r *http.Request) {
-	dao.UpdateVoter(a.DB, w, r)
+func (a *App) GetVote(w http.ResponseWriter, r *http.Request) {
+	dao.GetVote(a.DB, w, r)
 }
 
-func (a *App) DeleteVoter(w http.ResponseWriter, r *http.Request) {
-	dao.DeleteVoter(a.DB, w, r)
+func (a *App) UpdateVote(w http.ResponseWriter, r *http.Request) {
+	dao.UpdateVote(a.DB, w, r)
+}
+
+func (a *App) DeleteVote(w http.ResponseWriter, r *http.Request) {
+	dao.DeleteVote(a.DB, w, r)
 }
 
 //func (a *App) EnableEmployee(w http.ResponseWriter, r *http.Request) {

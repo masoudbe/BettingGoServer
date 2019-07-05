@@ -8,13 +8,13 @@ import (
 	"net/http"
 )
 
-func GetAllVoters(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+func GetVotes(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	voters := []model.VoteInfo{}
 	db.Find(&voters)
 	respondJSON(w, http.StatusOK, voters)
 }
 
-func CreateVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+func CreateVote(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	voter := model.VoteInfo{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -31,46 +31,41 @@ func CreateVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, voter)
 }
 
-func CreateVoters(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
-	voters := []model.VoteInfo{}
+func CreateVotes(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+	voteInfos := []model.VoteInfo{}
 
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&voters); err != nil {
+	if err := decoder.Decode(&voteInfos); err != nil {
 		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	//for _,voter := range voters{
-	//	if err := db.Debug().Create(&voter).Error; err != nil {
-	//		respondError(w, http.StatusInternalServerError, err.Error())
-	//		return
-	//	}
-	//}
-
-	if err := db.Debug().Create(&voters).Error; err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
-		return
+	for _, voter := range voteInfos {
+		if err := db.Create(&voter).Error; err != nil {
+			respondError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
-	respondJSON(w, http.StatusCreated, voters)
+	respondJSON(w, http.StatusCreated, voteInfos)
 }
 
-func GetVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+func GetVote(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	name := vars["name"]
-	voter := getVoterOr404(db, name, w, r)
+	voter := getVoteOr404(db, name, w, r)
 	if voter == nil {
 		return
 	}
 	respondJSON(w, http.StatusOK, voter)
 }
 
-func UpdateVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+func UpdateVote(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	name := vars["name"]
-	voter := getVoterOr404(db, name, w, r)
+	voter := getVoteOr404(db, name, w, r)
 	if voter == nil {
 		return
 	}
@@ -89,11 +84,11 @@ func UpdateVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, voter)
 }
 
-func DeleteVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+func DeleteVote(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	name := vars["name"]
-	employee := getVoterOr404(db, name, w, r)
+	employee := getVoteOr404(db, name, w, r)
 	if employee == nil {
 		return
 	}
@@ -108,7 +103,7 @@ func DeleteVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 //	vars := mux.Vars(r)
 //
 //	name := vars["name"]
-//	employee := getVoterOr404(db, name, w, r)
+//	employee := getVoteOr404(db, name, w, r)
 //	if employee == nil {
 //		return
 //	}
@@ -120,11 +115,10 @@ func DeleteVoter(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 //	respondJSON(w, http.StatusOK, employee)
 //}
 
-// getVoterOr404 gets a employee instance if exists, or respond the 404 error otherwise
-func getVoterOr404(db *gorm.DB, voter string, w http.ResponseWriter, r *http.Request) *model.Voter {
-	voterDto := model.Voter{}
+func getVoteOr404(db *gorm.DB, voter string, w http.ResponseWriter, r *http.Request) *model.VoteInfo {
+	voterDto := model.VoteInfo{}
 
-	if err := db.First(&voterDto, model.Voter{Name: voter}).Error; err != nil {
+	if err := db.First(&voterDto, model.VoteInfo{Name: voter}).Error; err != nil {
 		respondError(w, http.StatusNotFound, err.Error())
 		return nil
 	}
